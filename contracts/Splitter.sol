@@ -36,7 +36,7 @@ contract Splitter is BaseContract {
 
     modifier incomingFundsEven {
         require(
-            msg.value % 2 == 0,
+            msg.value.mod(2) == 0,
             incomingFundsNotEvenErrorMsg
         );
         _;
