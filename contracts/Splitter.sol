@@ -39,7 +39,7 @@ contract Splitter is Stoppable {
     }
 
     function splitAndSend(address payable dst1, address payable dst2) public payable
-    addressNonZero(dst1, dst2) sufficientIncomingFunds incomingFundsEven
+    addressNonZero(dst1, dst2) sufficientIncomingFunds incomingFundsEven onlyIfRunning
     returns (bool) {
         emit fundsReceived(msg.sender, msg.value);
         balance[msg.sender] = balance[msg.sender].add(msg.value);
