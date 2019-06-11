@@ -7,9 +7,9 @@ contract Splitter is Stoppable {
 
     using SafeMath for uint256;
 
-    event fundsReceived(address indexed sender, uint amount);
-    event fundsSplit(address indexed sender, uint amount);
-    event fundsSent(address indexed receiver, uint amount);
+    event FundsReceived(address indexed sender, uint amount);
+    event FundsSplit(address indexed sender, uint amount);
+    event FundsSent(address indexed receiver, uint amount);
 
     constructor(bool deployAsRunning) public Stoppable(deployAsRunning) {}
 
@@ -40,9 +40,9 @@ contract Splitter is Stoppable {
     function splitAndSend(address payable dst1, address payable dst2) public payable
     addressNonZero(dst1, dst2) sufficientIncomingFunds incomingFundsEven onlyIfRunning
     returns (bool) {
-        emit fundsReceived(msg.sender, msg.value);
+        emit FundsReceived(msg.sender, msg.value);
         uint splitBalance = msg.value.div(2);
-        emit fundsSplit(msg.sender, splitBalance);
+        emit FundsSplit(msg.sender, splitBalance);
         sendFunds(dst1, splitBalance);
         sendFunds(dst2, splitBalance);
         return true;
@@ -50,7 +50,7 @@ contract Splitter is Stoppable {
 
     function sendFunds(address payable dst, uint amount) private {
         dst.transfer(amount);
-        emit fundsSent(dst, amount);
+        emit FundsSent(dst, amount);
     }
 
 }
