@@ -7,7 +7,6 @@ contract Splitter is Stoppable {
 
     using SafeMath for uint256;
 
-    mapping (address => uint) balance;
     event fundsReceived(address indexed sender, uint amount);
     event fundsSplit(address indexed sender, uint amount);
     event fundsSent(address indexed receiver, uint amount);
@@ -42,8 +41,7 @@ contract Splitter is Stoppable {
     addressNonZero(dst1, dst2) sufficientIncomingFunds incomingFundsEven onlyIfRunning
     returns (bool) {
         emit fundsReceived(msg.sender, msg.value);
-        balance[msg.sender] = balance[msg.sender].add(msg.value);
-        uint splitBalance = balance[msg.sender].div(2);
+        uint splitBalance = msg.value.div(2);
         emit fundsSplit(msg.sender, splitBalance);
         sendFunds(dst1, splitBalance);
         sendFunds(dst2, splitBalance);
@@ -53,8 +51,6 @@ contract Splitter is Stoppable {
     function sendFunds(address payable dst, uint amount) private {
         dst.transfer(amount);
         emit fundsSent(dst, amount);
-        balance[msg.sender] = balance[msg.sender].sub(amount);
-        balance[dst] = balance[dst].add(amount);
     }
 
 }

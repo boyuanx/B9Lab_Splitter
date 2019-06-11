@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 contract Ownable {
 
     address owner;
-    event eventOwnerChanged(address sender, address newOwner);
+    event EventOwnerChanged(address sender, address newOwner);
 
     modifier onlyOwnerAccess {
         require(
@@ -19,7 +19,7 @@ contract Ownable {
 
     function changeOwner(address newOwner) public onlyOwnerAccess returns(bool) {
         owner = newOwner;
-        emit eventOwnerChanged(msg.sender, newOwner);
+        emit EventOwnerChanged(msg.sender, newOwner);
         return true;
     }
 
@@ -28,8 +28,8 @@ contract Ownable {
 contract Stoppable is Ownable {
 
     bool isRunning;
-    event eventPausedContract(address sender);
-    event eventResumedContract(address sender);
+    event EventPausedContract(address sender);
+    event EventResumedContract(address sender);
 
     modifier onlyIfRunning {
         require(
@@ -53,13 +53,13 @@ contract Stoppable is Ownable {
 
     function pauseContract() public onlyOwnerAccess onlyIfRunning returns(bool) {
         isRunning = false;
-        emit eventPausedContract(msg.sender);
+        emit EventPausedContract(msg.sender);
         return true;
     }
 
     function resumeContract() public onlyOwnerAccess onlyIfPaused returns(bool) {
         isRunning = true;
-        emit eventResumedContract(msg.sender);
+        emit EventResumedContract(msg.sender);
         return true;
     }
 
