@@ -62,7 +62,7 @@ contract Splitter is Stoppable {
         return true;
     }
 
-    function getBalance() public view returns (uint) {
+    function getBalance() public view onlyIfRunning returns (uint) {
         return balance[msg.sender];
     }
 
