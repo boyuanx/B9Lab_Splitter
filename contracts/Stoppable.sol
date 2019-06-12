@@ -5,8 +5,8 @@ import "./Ownable.sol";
 contract Stoppable is Ownable {
 
     bool isRunning;
-    event EventPausedContract(address sender);
-    event EventResumedContract(address sender);
+    event EventPausedContract(address indexed sender);
+    event EventResumedContract(address indexed sender);
 
     modifier onlyIfRunning {
         require(

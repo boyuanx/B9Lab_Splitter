@@ -8,13 +8,13 @@ contract Splitter is Stoppable {
 
     using SafeMath for uint256;
 
-    mapping (address => uint) balance;
+    mapping (address => uint) private balance;
     event FundsWithdrawn(address indexed receiver, uint amount);
     event FundsReceivedAndStored(address indexed sender, address indexed dst1, address indexed dst2, uint amount);
 
     constructor(bool deployAsRunning) public Stoppable(deployAsRunning) {}
 
-    modifier addressNonZero(address dst1, address dst2) {
+    modifier addressesNonZero(address dst1, address dst2) {
         require(
             (dst1 != address(0)) && (dst2 != address(0)),
             "E_ZA"
@@ -47,7 +47,7 @@ contract Splitter is Stoppable {
     }
 
     function depositAndStore(address payable dst1, address payable dst2) public payable
-    addressNonZero(dst1, dst2) onlyIfRunning sufficientIncomingFunds incomingFundsEven returns (bool) {
+    addressesNonZero(dst1, dst2) onlyIfRunning sufficientIncomingFunds incomingFundsEven returns (bool) {
         uint splitBalance = msg.value.div(2);
         balance[dst1] = balance[dst1].add(splitBalance);
         balance[dst2] = balance[dst2].add(splitBalance);
@@ -56,14 +56,14 @@ contract Splitter is Stoppable {
     }
 
     function withdraw(uint amount) public onlyIfRunning sufficientBalanceForWithdrawal(amount) returns (bool) {
-        msg.sender.transfer(amount);
         balance[msg.sender] = balance[msg.sender].sub(amount);
+        msg.sender.transfer(amount);
         emit FundsWithdrawn(msg.sender, amount);
         return true;
     }
 
-    function getBalance() public view onlyIfRunning returns (uint) {
-        return balance[msg.sender];
+    function getBalance(address addr) public view onlyIfRunning returns (uint) {
+        return balance[addr];
     }
 
 }
