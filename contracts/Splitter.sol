@@ -1,15 +1,16 @@
 pragma solidity ^0.5.0;
 
 import "./SafeMath.sol";
-import "./BaseContract.sol";
+import "./Ownable.sol";
+import "./Stoppable.sol";
 
 contract Splitter is Stoppable {
 
     using SafeMath for uint256;
 
-    event FundsReceived(address indexed sender, uint amount);
-    event FundsSplit(address indexed sender, uint amount);
-    event FundsSent(address indexed receiver, uint amount);
+    mapping (address => uint) balance;
+    event FundsWithdrawn(address indexed receiver, uint amount);
+    event FundsReceivedAndStored(address indexed sender, address indexed dst1, address indexed dst2, uint amount);
 
     constructor(bool deployAsRunning) public Stoppable(deployAsRunning) {}
 
@@ -37,20 +38,32 @@ contract Splitter is Stoppable {
         _;
     }
 
-    function splitAndSend(address payable dst1, address payable dst2) public payable
-    addressNonZero(dst1, dst2) sufficientIncomingFunds incomingFundsEven onlyIfRunning
-    returns (bool) {
-        emit FundsReceived(msg.sender, msg.value);
+    modifier sufficientBalanceForWithdrawal(uint requestedAmount) {
+        require(
+            balance[msg.sender] >= requestedAmount,
+            "E_IB"
+        );
+        _;
+    }
+
+    function depositAndStore(address payable dst1, address payable dst2) public payable
+    addressNonZero(dst1, dst2) onlyIfRunning sufficientIncomingFunds incomingFundsEven returns (bool) {
         uint splitBalance = msg.value.div(2);
-        emit FundsSplit(msg.sender, splitBalance);
-        sendFunds(dst1, splitBalance);
-        sendFunds(dst2, splitBalance);
+        balance[dst1] = balance[dst1].add(splitBalance);
+        balance[dst2] = balance[dst2].add(splitBalance);
+        emit FundsReceivedAndStored(msg.sender, dst1, dst2, splitBalance);
         return true;
     }
 
-    function sendFunds(address payable dst, uint amount) private {
-        dst.transfer(amount);
-        emit FundsSent(dst, amount);
+    function withdraw(uint amount) public onlyIfRunning sufficientBalanceForWithdrawal(amount) returns (bool) {
+        msg.sender.transfer(amount);
+        balance[msg.sender] = balance[msg.sender].sub(amount);
+        emit FundsWithdrawn(msg.sender, amount);
+        return true;
+    }
+
+    function getBalance() public view returns (uint) {
+        return balance[msg.sender];
     }
 
 }
