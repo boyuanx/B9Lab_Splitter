@@ -22,13 +22,13 @@ contract Stoppable is Ownable {
         isRunning = initialRunState;
     }
 
-    function pauseContract() public onlyOwnerAccess onlyIfRunning returns(bool) {
+    function pauseContract() public onlyOwnerAccess onlyIfRunning returns(bool success) {
         isRunning = false;
         emit LogPausedContract(msg.sender);
         return true;
     }
 
-    function resumeContract() public onlyOwnerAccess onlyIfPaused returns(bool) {
+    function resumeContract() public onlyOwnerAccess onlyIfPaused returns(bool success) {
         isRunning = true;
         emit LogResumedContract(msg.sender);
         return true;

@@ -10,16 +10,16 @@ contract Ownable {
         _;
     }
 
-    modifier addressNonZero(address addr) {
-        require(addr != address(0), "E_IS");
+    modifier addressNonZero(address recipient) {
+        require(recipient != address(0), "E_IS");
         _;
     }
 
-    constructor() public addressNonZero(msg.sender) {
+    constructor() public {
         owner = msg.sender;
     }
 
-    function changeOwner(address newOwner) public addressNonZero(newOwner) onlyOwnerAccess returns(bool) {
+    function changeOwner(address newOwner) public addressNonZero(newOwner) onlyOwnerAccess returns(bool success) {
         owner = newOwner;
         emit LogOwnerChanged(msg.sender, newOwner);
         return true;
