@@ -9,7 +9,7 @@ contract Splitter is Stoppable {
     using SafeMath for uint256;
 
     mapping (address => uint) private balances;
-    event LogOddInput1WeiSentBack(address indexed sender);
+    event LogOddFunds1WeiSentBack(address indexed sender);
     event LogFundsReceivedAndStored(address indexed sender, address indexed dst1, address indexed dst2, uint amount);
     event LogFundsWithdrawn(address indexed receiver, uint amount);
 
@@ -20,21 +20,16 @@ contract Splitter is Stoppable {
         _;
     }
 
-    modifier incomingFundsEven {
-        require(msg.value.mod(2) == 0, "E_FO");
-        _;
-    }
-
     modifier sufficientBalanceForWithdrawal(uint requestedAmount) {
         require(balances[msg.sender] >= requestedAmount, "E_IB");
         _;
     }
 
     function depositAndStore(address payable dst1, address payable dst2) public payable
-    addressNonZero(dst1) addressNonZero(dst2) onlyIfRunning sufficientIncomingFunds incomingFundsEven returns (bool success) {
+    addressNonZero(dst1) addressNonZero(dst2) onlyIfRunning sufficientIncomingFunds returns (bool success) {
         uint incomingBalance = msg.value;
         if (incomingBalance.mod(2) != 0) {
-            emit LogOddInput1WeiSentBack(msg.sender);
+            emit LogOddFunds1WeiSentBack(msg.sender);
             msg.sender.transfer(1);
             incomingBalance--;
         }
