@@ -4,39 +4,33 @@ import "./Ownable.sol";
 
 contract Stoppable is Ownable {
 
-    bool isRunning;
-    event EventPausedContract(address indexed sender);
-    event EventResumedContract(address indexed sender);
+    bool private isRunning;
+    event LogPausedContract(address indexed sender);
+    event LogResumedContract(address indexed sender);
 
     modifier onlyIfRunning {
-        require(
-            isRunning,
-            "E_NR"
-        );
+        require(isRunning, "E_NR");
         _;
     }
     
     modifier onlyIfPaused {
-        require(
-            !isRunning,
-            "E_NP"
-        );
+        require(!isRunning, "E_NP");
         _;
     }
 
-    constructor(bool deployAsRunning) public {
-        isRunning = deployAsRunning;
+    constructor(bool initialRunState) public {
+        isRunning = initialRunState;
     }
 
     function pauseContract() public onlyOwnerAccess onlyIfRunning returns(bool) {
         isRunning = false;
-        emit EventPausedContract(msg.sender);
+        emit LogPausedContract(msg.sender);
         return true;
     }
 
     function resumeContract() public onlyOwnerAccess onlyIfPaused returns(bool) {
         isRunning = true;
-        emit EventResumedContract(msg.sender);
+        emit LogResumedContract(msg.sender);
         return true;
     }
 
