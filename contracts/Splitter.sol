@@ -20,20 +20,13 @@ contract Splitter is Stoppable {
         _;
     }
 
-    modifier sufficientBalanceForWithdrawal(uint requestedAmount) {
-        require(balances[msg.sender] >= requestedAmount, "E_IB");
-        _;
-    }
-
-    function depositAndStore(address payable dst1, address payable dst2) public payable
+    function depositAndStore(address dst1, address dst2) public payable
     addressNonZero(dst1) addressNonZero(dst2) onlyIfRunning sufficientIncomingFunds returns (bool success) {
-        uint incomingBalance = msg.value;
-        if (incomingBalance.mod(2) != 0) {
+        if (msg.value.mod(2) == 1) {
             emit LogOddFunds1WeiSentBack(msg.sender);
             msg.sender.transfer(1);
-            incomingBalance--;
         }
-        uint splitBalance = incomingBalance.div(2);
+        uint splitBalance = msg.value.div(2);
         balances[dst1] = balances[dst1].add(splitBalance);
         balances[dst2] = balances[dst2].add(splitBalance);
         emit LogFundsReceivedAndStored(msg.sender, dst1, dst2, splitBalance);
