@@ -8,7 +8,7 @@ contract Splitter is Stoppable {
 
     using SafeMath for uint256;
 
-    mapping (address => uint) private balances;
+    mapping (address => uint) public balances;
     event LogOddFunds1WeiSentBack(address indexed sender);
     event LogFundsReceivedAndStored(address indexed sender, address indexed dst1, address indexed dst2, uint amount);
     event LogFundsWithdrawn(address indexed receiver, uint amount);
@@ -38,10 +38,6 @@ contract Splitter is Stoppable {
         emit LogFundsWithdrawn(msg.sender, amount);
         msg.sender.transfer(amount);
         return true;
-    }
-
-    function getBalance(address recipient) public view onlyIfRunning returns (uint balance) {
-        return balances[recipient];
     }
 
 }
