@@ -22,6 +22,10 @@ contract Stoppable is Ownable {
         isRunning = initialRunState;
     }
 
+    function contractIsRunning() public view returns(bool) {
+        return isRunning;
+    }
+
     function pauseContract() public onlyOwnerAccess onlyIfRunning returns(bool success) {
         isRunning = false;
         emit LogPausedContract(msg.sender);
