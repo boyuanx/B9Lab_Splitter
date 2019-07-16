@@ -9,8 +9,7 @@ contract Splitter is Stoppable {
     using SafeMath for uint256;
 
     mapping (address => uint) public balances;
-    event LogOddFunds1WeiStoredForSender(address indexed sender);
-    event LogFundsReceivedAndStored(address indexed sender, address indexed dst1, address indexed dst2, uint splitBalance);
+    event LogFundsReceivedAndStored(address indexed sender, address indexed dst1, address indexed dst2, uint incomingFunds, uint splitBalance);
     event LogFundsWithdrawn(address indexed receiver, uint amount);
 
     constructor(bool initialRunState) public Stoppable(initialRunState) {}
@@ -25,9 +24,8 @@ contract Splitter is Stoppable {
         uint splitBalance = msg.value.div(2);
         balances[dst1] = balances[dst1].add(splitBalance);
         balances[dst2] = balances[dst2].add(splitBalance);
-        emit LogFundsReceivedAndStored(msg.sender, dst1, dst2, splitBalance);
+        emit LogFundsReceivedAndStored(msg.sender, dst1, dst2, msg.value, splitBalance);
         if (msg.value.mod(2) == 1) {
-            emit LogOddFunds1WeiStoredForSender(msg.sender);
             balances[msg.sender] = balances[msg.sender].add(1);
         }
         return true;
