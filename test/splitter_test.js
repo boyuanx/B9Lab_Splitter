@@ -32,6 +32,7 @@ contract("Splitter", accounts => {
             assert.equal(log.args.sender, sender);
             assert.equal(log.args.dst1, dst1);
             assert.equal(log.args.dst2, dst2);
+            assert.equal(log.args.incomingFunds.toNumber(), deposit);
             assert.equal(log.args.splitBalance.toNumber(), deposit/2);
         });
     

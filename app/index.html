@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
-<title>Splitter</title>
+<title>(Terribly ugly) Splitter</title>
 <meta charset="utf-8">
 
 
@@ -10,12 +10,22 @@
 </head>
 <body>
 
-<div>Splits your deposit evenly between two receipients! Current holding <span id="balance">(Loading)</span> weis!</div>
+<div>Splits your deposit evenly between two receipients! Currently holding <span id="contractBalance">(Loading)</span> weis!</div>
 <div>
-    Amount to split: <input name="deposit" type="number" placeholder="0"/>
+    Amount to split: <input name="depositAmount" type="number" placeholder="0"/>
+    <br />
     Receipient 1: <input name="dst1" type="text" placeholder="0x0011223344556677889900112233445566778899"/>
-    Receipient 2: <input name="dst1" type="text" placeholder="0x0011223344556677889900112233445566778899"/>
-    <button id="split">Split!</button>
+    <br />
+    Receipient 2: <input name="dst2" type="text" placeholder="0x0011223344556677889900112233445566778899"/>
+    <br />
+    <button id="split" onclick="App.split()">Split!</button>
+    <br />
+</div>
+<div>You currently have <span id="accountBalance">(Loading)</span> weis.</div>
+<div>
+    Amount to withdraw: <input name="withdrawAmount" type="number"/>
+    <br />
+    <button id="withdraw" onclick="App.withdrawFunds()">Withdraw!</button>
 </div>
 <div id="status"></div>
 
