@@ -63,8 +63,8 @@ const App = {
         const { depositAndStore } = this.splitter.methods;
 
         return depositAndStore(dst1, dst2).send({ from: this.account, value: depositAmount })
-            .then(receipt => {
-                console.log(receipt);
+            .then(receipt1 => {
+                console.log(receipt1);
                 console.log("testing");
             })
     },
