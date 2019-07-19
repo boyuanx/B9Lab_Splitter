@@ -3,7 +3,7 @@ const Stoppable = artifacts.require("Stoppable");
 contract("Stoppable", accounts => {
     const owner = accounts[0];
     let stoppable;
-    let catchRevert = require("./exceptions.js").catchRevert;
+    const catchRevert = require("./exceptions.js").catchRevert;
 
     describe("deploying as running", () => {
         beforeEach("deploy this contract as running", async () => {
@@ -11,16 +11,16 @@ contract("Stoppable", accounts => {
         })
 
         it("should be running", async () => {
-            assert.equal(true, await stoppable.isRunning());
+            assert.strictEqual(true, await stoppable.isRunning());
         })
 
         it("should be able to be paused", async () => {
             const pauseReceipt = await stoppable.pauseContract({ from: owner });
-            assert.equal(false, await stoppable.isRunning());
-            assert.equal(pauseReceipt.logs.length, 1);
+            assert.strictEqual(false, await stoppable.isRunning());
+            assert.strictEqual(pauseReceipt.logs.length, 1);
             const log = pauseReceipt.logs[0];
-            assert.equal(log.event, "LogPausedContract");
-            assert.equal(log.args.sender, owner);
+            assert.strictEqual(log.event, "LogPausedContract");
+            assert.strictEqual(log.args.sender, owner);
         })
 
         it("should not be able to be resumed", async () => {
@@ -34,16 +34,16 @@ contract("Stoppable", accounts => {
         })
 
         it("should be paused", async () => {
-            assert.equal(false, await stoppable.isRunning());
+            assert.strictEqual(false, await stoppable.isRunning());
         })
 
         it("should be able to be resumed", async () => {
             const resumedReceipt = await stoppable.resumeContract({ from: owner });
-            assert.equal(true, await stoppable.isRunning());
-            assert.equal(resumedReceipt.logs.length, 1);
+            assert.strictEqual(true, await stoppable.isRunning());
+            assert.strictEqual(resumedReceipt.logs.length, 1);
             const log = resumedReceipt.logs[0];
-            assert.equal(log.event, "LogResumedContract");
-            assert.equal(log.args.sender, owner);
+            assert.strictEqual(log.event, "LogResumedContract");
+            assert.strictEqual(log.args.sender, owner);
         })
 
         it("should not be able to be paused", async () => {
