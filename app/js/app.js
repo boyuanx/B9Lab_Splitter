@@ -1,5 +1,4 @@
 import Web3 from "web3";
-import truffleContract from "truffle-contract";
 import $ from "jquery";
 import splitterJson from "../../build/contracts/Splitter.json";
 import "file-loader?name=../index.html!../index.html";
@@ -8,6 +7,7 @@ const App = {
     web3: null,
     account: null,
     splitter: null,
+    receipt: null,
 
     start: async function() {
         const { web3 } = this;
@@ -19,43 +19,66 @@ const App = {
                 splitterJson.abi,
                 deployedNetwork.address
             );
-
             const accounts = await web3.eth.getAccounts();
-            this.account = accounts[2];
+            this.account = accounts[0];
 
-            this.loadBalance();
+            await this.loadBalance();
         } catch (error) {
-            console.log(error);
+            alert(error);
         }
     },
 
     loadBalance: async function() {
         const contractBalance = await this.web3.eth.getBalance(this.splitter.address);
-        $("#contractBalance").html(contractBalance.toString());
+        $("#contractBalance").html(contractBalance.toString(10));
 
         const { balances } = this.splitter.methods;
         const accountBalance = await balances(this.account).call();
-        $("#accountBalance").html(accountBalance.toString());
+        $("#accountBalance").html(accountBalance.toString(10));
     },
 
     split: async function() {
         const depositAmount = $("input[name='depositAmount']").val();
         const dst1 = $("input[name='dst1']").val();
         const dst2 = $("input[name='dst2']").val();
-        
         const { depositAndStore } = this.splitter.methods;
-        await depositAndStore(dst1, dst2).send({ from: this.account, value: depositAmount })
 
-        this.loadBalance();
+        try {
+            this.receipt = await depositAndStore(dst1, dst2).send({ from: this.account, value: depositAmount });
+            const log = this.receipt.logs[0];
+            alert("Split successful between " + log.args.dst1 + " and " + log.args.dst2 + ", each will receive " + log.args.splitBalance.toString(10), + " weis.");
+            console.log("here");
+            console.log(log);
+            await this.loadBalance();
+        } catch (error) {
+            alert(error);
+            console.log("error");
+        }
+    },
+
+    splitThen: function() {
+        const depositAmount = $("input[name='depositAmount']").val();
+        const dst1 = $("input[name='dst1']").val();
+        const dst2 = $("input[name='dst2']").val();
+        const { depositAndStore } = this.splitter.methods;
+
+        return depositAndStore(dst1, dst2).send({ from: this.account, value: depositAmount })
+            .then(receipt => {
+                console.log(receipt);
+                console.log("testing");
+            })
     },
 
     withdrawFunds: async function() {
         const withdrawAmount = $("input[name='withdrawAmount']").val();
-        
-        const { withdraw } = this.splitter.methods;
-        await withdraw(withdrawAmount).send({ from: this.account });
-
-        this.loadBalance();
+        try {
+            const { withdraw } = this.splitter.methods;
+            const receipt = await withdraw(withdrawAmount).send({ from: this.account });
+            console.log(receipt);
+            await this.loadBalance();
+        } catch (error) {
+            alert(error);
+        }
     }
 
 }
@@ -73,5 +96,6 @@ window.addEventListener('load', function() {
           );
         App.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545')); 
     }
+
     App.start();
 });

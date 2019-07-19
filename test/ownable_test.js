@@ -31,9 +31,7 @@ contract("Ownable", accounts => {
         });
 
         it ("should disallow changing owner to 0x0", async () => {
-            // Fails, gives 'invalid address (arg="newOwner", coderType="address", value="0x0")'
-            // Not too sure how to pass in address(0)...
-            await catchRevert(ownable.changeOwner(0, { from: owner0 }), "E_IS");
+            await catchRevert(ownable.changeOwner(web3.utils.padLeft(0, 40), { from: owner0 }), "E_IS");
         });
     })
 })

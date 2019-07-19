@@ -21,8 +21,8 @@ contract("Splitter", accounts => {
         it("should split funds evenly between the two recepients", async () => {
             const dst1Balance = await splitter.balances(dst1);
             const dst2Balance = await splitter.balances(dst2);
-            assert.isAbove(dst1Balance.toNumber(), 0);
-            assert.equal(dst1Balance.toNumber(), dst2Balance.toNumber());
+            assert.notEqual(dst1Balance.toString(10), 0);
+            assert.equal(dst1Balance.toString(10), dst2Balance.toString(10));
         });
 
         it("should emit the proper deposit and storage events", async () => {
@@ -32,8 +32,8 @@ contract("Splitter", accounts => {
             assert.equal(log.args.sender, sender);
             assert.equal(log.args.dst1, dst1);
             assert.equal(log.args.dst2, dst2);
-            assert.equal(log.args.incomingFunds.toNumber(), deposit);
-            assert.equal(log.args.splitBalance.toNumber(), deposit/2);
+            assert.equal(log.args.incomingFunds.toString(10), deposit);
+            assert.equal(log.args.splitBalance.toString(10), deposit/2);
         });
     
         it("should correctly let the recepients withdraw their funds and emit the proper events", async () => {
@@ -50,7 +50,7 @@ contract("Splitter", accounts => {
             const log = dst1Receipt.logs[0];
             assert.equal(log.event, "LogFundsWithdrawn");
             assert.equal(log.args.receiver, dst1);
-            assert.equal(log.args.amount.toNumber(), dst1InitialSplitterBalance);
+            assert.equal(log.args.amount.toString(10), dst1InitialSplitterBalance);
 
             assert.equal(dst1FinalBalance, new BN(dst1InitialBalance).add(new BN(dst1InitialSplitterBalance)).sub(new BN(gasPrice*gasUsed)));
             assert.equal(dst1FinalSplitterBalance, 0);
@@ -65,7 +65,7 @@ contract("Splitter", accounts => {
 
         it("should detect the odd input and refund 1 wei to the sender", async () => {
             const senderBalance = await splitter.balances(sender);
-            assert.equal(senderBalance.toNumber(), 1);
+            assert.equal(senderBalance.toString(10), 1);
         });
     });
 
