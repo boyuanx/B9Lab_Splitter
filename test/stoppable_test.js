@@ -1,9 +1,9 @@
 const Stoppable = artifacts.require("Stoppable");
+const truffleAssert = require("truffle-assertions")
 
 contract("Stoppable", accounts => {
     const owner = accounts[0];
     let stoppable;
-    const catchRevert = require("./exceptions.js").catchRevert;
 
     describe("deploying as running", () => {
         beforeEach("deploy this contract as running", async () => {
@@ -24,7 +24,7 @@ contract("Stoppable", accounts => {
         })
 
         it("should not be able to be resumed", async () => {
-            await catchRevert(stoppable.resumeContract({ from: owner }), "E_NP");
+            await truffleAssert.reverts(stoppable.resumeContract({ from: owner }), "E_NP");
         })
     })
 
@@ -47,7 +47,7 @@ contract("Stoppable", accounts => {
         })
 
         it("should not be able to be paused", async () => {
-            await catchRevert(stoppable.pauseContract({ from: owner }), "E_NR");
+            await truffleAssert.reverts(stoppable.pauseContract({ from: owner }), "E_NR");
         })
     })
 })

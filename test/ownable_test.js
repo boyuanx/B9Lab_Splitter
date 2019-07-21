@@ -1,9 +1,9 @@
 const Ownable = artifacts.require("Ownable");
+const truffleAssert = require("truffle-assertions")
 
 contract("Ownable", accounts => {
     const [owner0, owner1] = accounts;
     let ownable;
-    const catchRevert = require("./exceptions.js").catchRevert;
 
     describe("smoke tests", () => {
         beforeEach("deploy this contract as owner0", async () => {
@@ -27,11 +27,11 @@ contract("Ownable", accounts => {
         });
 
         it("should disallow ownership change from non-owner", async () => {
-            await catchRevert(ownable.changeOwner(owner1, { from: owner1 }), "E_NO");
+            await truffleAssert.reverts(ownable.changeOwner(owner1, { from: owner1 }), "E_NO");
         });
 
         it ("should disallow changing owner to 0x0", async () => {
-            await catchRevert(ownable.changeOwner(web3.utils.padLeft(0, 40), { from: owner0 }), "E_IS");
+            await truffleAssert.reverts(ownable.changeOwner(web3.utils.padLeft(0, 40), { from: owner0 }), "E_IS");
         });
     })
 })

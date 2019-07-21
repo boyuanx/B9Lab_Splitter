@@ -7,7 +7,6 @@ const App = {
     web3: null,
     account: null,
     splitter: null,
-    receipt: null,
 
     start: async function() {
         const { web3 } = this;
@@ -44,38 +43,41 @@ const App = {
         const { depositAndStore } = this.splitter.methods;
 
         try {
-            this.receipt = await depositAndStore(dst1, dst2).send({ from: this.account, value: depositAmount });
-            const log = this.receipt.logs[0];
-            alert("Split successful between " + log.args.dst1 + " and " + log.args.dst2 + ", each will receive " + log.args.splitBalance.toString(10), + " weis.");
-            console.log("here");
-            console.log(log);
-            await this.loadBalance();
+            await depositAndStore(dst1, dst2).call({ from: this.account, value: depositAmount });
+            // I have determined the root cause of this issue is some kind of bug in web3.js:
+            // https://github.com/ethereum/web3.js/issues/2661
+            // This is a temperary workaround which IMO isn't too bad either.
+            depositAndStore(dst1, dst2).send({ from: this.account, value: depositAmount })
+                .on("transactionHash", txHash => {
+                    alert("Transaction pending, you can use this hash to look it up: " + txHash);
+                })
+                .on("confirmation", async (confNumber, receipt) => {
+                    if (confNumber == 1) {
+                        alert("Your deposit has been confirmed on the blockchain!")
+                    }
+                    await this.loadBalance();
+                })
         } catch (error) {
             alert(error);
             console.log("error");
         }
     },
 
-    splitThen: function() {
-        const depositAmount = $("input[name='depositAmount']").val();
-        const dst1 = $("input[name='dst1']").val();
-        const dst2 = $("input[name='dst2']").val();
-        const { depositAndStore } = this.splitter.methods;
-
-        return depositAndStore(dst1, dst2).send({ from: this.account, value: depositAmount })
-            .then(receipt1 => {
-                console.log(receipt1);
-                console.log("testing");
-            })
-    },
-
     withdrawFunds: async function() {
         const withdrawAmount = $("input[name='withdrawAmount']").val();
         try {
             const { withdraw } = this.splitter.methods;
-            const receipt = await withdraw(withdrawAmount).send({ from: this.account });
-            console.log(receipt);
-            await this.loadBalance();
+            await withdraw(withdrawAmount).call({ from: this.account });
+            withdraw(withdrawAmount).send({ from: this.account })
+                .on("transactionHash", txHash => {
+                    alert("Transaction pending, you can use this hash to look it up: " + txHash);
+                })
+                .on("confirmation", async (confNumber, receipt) => {
+                    if (confNumber == 1) {
+                        alert("Your withdrawal has been confirmed on the blockchain!")
+                    }
+                    await this.loadBalance();
+                })
         } catch (error) {
             alert(error);
         }
