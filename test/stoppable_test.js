@@ -26,6 +26,14 @@ contract("Stoppable", accounts => {
         it("should not be able to be resumed", async () => {
             await truffleAssert.reverts(stoppable.resumeContract({ from: owner }), "E_NP");
         })
+
+        it("should be killed and cannot be revived", async () => {
+            const killReceipt = await stoppable.killContract({ from: owner });
+            assert.strictEqual(false, await stoppable.isAlive());
+            truffleAssert.eventEmitted(killReceipt, "LogKilledContract", { sender: owner });
+            await truffleAssert.reverts(stoppable.resumeContract({ from: owner }), "E_NP");
+            await truffleAssert.reverts(stoppable.pauseContract({ from: owner }), "E_NR");
+        })
     })
 
     describe("deploying as paused", () => {
