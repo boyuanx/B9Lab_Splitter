@@ -47,7 +47,6 @@ contract Stoppable is Ownable {
 
     function killContract() public onlyIfPaused onlyOwnerAccess returns(bool success) {
         _isAlive = false;
-        _isRunning = false;
         emit LogKilledContract(msg.sender);
         return true;
     }
