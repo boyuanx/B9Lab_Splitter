@@ -20,11 +20,6 @@ contract Stoppable is Ownable {
         _;
     }
 
-    modifier onlyIfAlive {
-        require(_isAlive, "E_CD");
-        _;
-    }
-
     constructor(bool initialRunState) public {
         _isRunning = initialRunState;
         _isAlive = true;
@@ -50,7 +45,7 @@ contract Stoppable is Ownable {
         return true;
     }
 
-    function killContract() public onlyIfAlive onlyOwnerAccess returns(bool success) {
+    function killContract() public onlyIfPaused onlyOwnerAccess returns(bool success) {
         _isAlive = false;
         _isRunning = false;
         emit LogKilledContract(msg.sender);
