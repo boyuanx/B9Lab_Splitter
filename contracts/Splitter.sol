@@ -18,6 +18,11 @@ contract Splitter is Stoppable {
         require(msg.value > 0, "E_IF");
         _;
     }
+    
+    modifier nonZeroWithdrawal(uint amount) {
+        require(amount > 0, "E_ZA");
+        _;
+    }
 
     function depositAndStore(address dst1, address dst2) public payable
     addressNonZero(dst1) addressNonZero(dst2) onlyIfRunning sufficientIncomingFunds returns (bool success) {
@@ -31,7 +36,7 @@ contract Splitter is Stoppable {
         return true;
     }
 
-    function withdraw(uint amount) public onlyIfRunning returns (bool success) {
+    function withdraw(uint amount) public onlyIfRunning nonZeroWithdrawal(amount) returns (bool success) {
         balances[msg.sender] = balances[msg.sender].sub(amount);
         emit LogFundsWithdrawn(msg.sender, amount);
         msg.sender.transfer(amount);

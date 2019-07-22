@@ -1,4 +1,5 @@
 const Splitter = artifacts.require("Splitter");
+const truffleAssert = require("truffle-assertions")
 
 contract("Splitter", accounts => {
     const { BN, toWei } = web3.utils;
@@ -36,6 +37,10 @@ contract("Splitter", accounts => {
             assert.strictEqual(log.args.splitBalance.toString(10), (deposit/2).toString(10));
         });
     
+        it("should disallow zero wei split", async () => {
+            truffleAssert.reverts(splitter.withdraw(0, { from: dst1, gas: 3000000 }), "E_ZA");
+        });
+
         it("should correctly let the recepients withdraw their funds and emit the proper events", async () => {
             const dst1InitialBalance = await web3.eth.getBalance(dst1);
             const dst1InitialSplitterBalance = await splitter.balances(dst1);

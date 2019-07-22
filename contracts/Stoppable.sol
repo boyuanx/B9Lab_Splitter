@@ -38,4 +38,9 @@ contract Stoppable is Ownable {
         return true;
     }
 
+    function killContract() public onlyOwnerAccess {
+        address payable owner = address(uint160(getOwner()));
+        selfdestruct(owner);
+    }
+
 }
